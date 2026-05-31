@@ -11,16 +11,18 @@ import {
     Button,
 } from '@heroui/react';
 import React from 'react';
+import { toast } from 'react-toastify';
 
 const AddDestinations = () => {
     const onSubmit = async (e) => {
-        e.preventDefault();
+    e.preventDefault();
 
-        const formData = new FormData(e.target);
-        const destination = Object.fromEntries(formData.entries());
+    const form = e.target;
 
-        console.log('New Destination:', destination);
+    const formData = new FormData(form);
+    const destination = Object.fromEntries(formData.entries());
 
+    try {
         const res = await fetch('http://localhost:5000/destination', {
             method: 'POST',
             headers: {
@@ -30,8 +32,19 @@ const AddDestinations = () => {
         });
 
         const data = await res.json();
-        console.log(data);
-    };
+
+        if (res.ok) {
+            toast.success('Destination added successfully!');
+            form.reset(); // <-- form clear hobe
+            console.log(data);
+        } else {
+            toast.error(data.message || 'Failed to add destination');
+        }
+    } catch (error) {
+        console.error(error);
+        toast.error('Something went wrong!');
+    }
+};
 
     return (
         <div className="p-5 max-w-7xl mx-auto">
